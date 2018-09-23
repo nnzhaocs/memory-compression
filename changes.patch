@@ -1,5 +1,5 @@
-diff -ruN linux-stable-orginal/.project linux-stable-cmask/.project
---- linux-stable-orginal/.project	1969-12-31 19:00:00.000000000 -0500
+diff -ruN linux-stable/.project linux-stable-cmask/.project
+--- linux-stable/.project	1969-12-31 19:00:00.000000000 -0500
 +++ linux-stable-cmask/.project	2018-09-22 14:04:27.000000000 -0400
 @@ -0,0 +1,11 @@
 +<?xml version="1.0" encoding="UTF-8"?>
@@ -13,8 +13,8 @@ diff -ruN linux-stable-orginal/.project linux-stable-cmask/.project
 +	<natures>
 +	</natures>
 +</projectDescription>
-diff -ruN linux-stable-orginal/arch/x86/entry/syscalls/syscall_64.tbl linux-stable-cmask/arch/x86/entry/syscalls/syscall_64.tbl
---- linux-stable-orginal/arch/x86/entry/syscalls/syscall_64.tbl	2018-09-22 14:07:24.000000000 -0400
+diff -ruN linux-stable/arch/x86/entry/syscalls/syscall_64.tbl linux-stable-cmask/arch/x86/entry/syscalls/syscall_64.tbl
+--- linux-stable/arch/x86/entry/syscalls/syscall_64.tbl	2018-09-22 14:07:24.000000000 -0400
 +++ linux-stable-cmask/arch/x86/entry/syscalls/syscall_64.tbl	2018-09-22 13:19:47.000000000 -0400
 @@ -332,6 +332,11 @@
  323	common	userfaultfd		sys_userfaultfd
@@ -28,8 +28,8 @@ diff -ruN linux-stable-orginal/arch/x86/entry/syscalls/syscall_64.tbl linux-stab
  #
  # x32-specific system call numbers start at 512 to avoid cache impact
  # for native 64-bit operation.
-diff -ruN linux-stable-orginal/include/linux/syscalls.h linux-stable-cmask/include/linux/syscalls.h
---- linux-stable-orginal/include/linux/syscalls.h	2018-09-22 14:07:32.000000000 -0400
+diff -ruN linux-stable/include/linux/syscalls.h linux-stable-cmask/include/linux/syscalls.h
+--- linux-stable/include/linux/syscalls.h	2018-09-22 14:07:32.000000000 -0400
 +++ linux-stable-cmask/include/linux/syscalls.h	2018-09-22 13:37:08.000000000 -0400
 @@ -887,4 +887,10 @@
  
@@ -42,8 +42,8 @@ diff -ruN linux-stable-orginal/include/linux/syscalls.h linux-stable-cmask/inclu
 +asmlinkage long sys_cmask_insert_SPP_to_IAL(sector_t sector);
 +
  #endif
-diff -ruN linux-stable-orginal/kernel/sys.c linux-stable-cmask/kernel/sys.c
---- linux-stable-orginal/kernel/sys.c	2018-09-22 14:07:33.000000000 -0400
+diff -ruN linux-stable/kernel/sys.c linux-stable-cmask/kernel/sys.c
+--- linux-stable/kernel/sys.c	2018-09-22 14:07:33.000000000 -0400
 +++ linux-stable-cmask/kernel/sys.c	2018-09-22 13:56:23.000000000 -0400
 @@ -2364,6 +2364,16 @@
  	return 0;
@@ -62,8 +62,8 @@ diff -ruN linux-stable-orginal/kernel/sys.c linux-stable-cmask/kernel/sys.c
  #ifdef CONFIG_COMPAT
  struct compat_sysinfo {
  	s32 uptime;
-diff -ruN linux-stable-orginal/mm/kcmask.c linux-stable-cmask/mm/kcmask.c
---- linux-stable-orginal/mm/kcmask.c	1969-12-31 19:00:00.000000000 -0500
+diff -ruN linux-stable/mm/kcmask.c linux-stable-cmask/mm/kcmask.c
+--- linux-stable/mm/kcmask.c	1969-12-31 19:00:00.000000000 -0500
 +++ linux-stable-cmask/mm/kcmask.c	2018-09-22 16:19:55.000000000 -0400
 @@ -0,0 +1,1316 @@
 +/*
@@ -1382,8 +1382,8 @@ diff -ruN linux-stable-orginal/mm/kcmask.c linux-stable-cmask/mm/kcmask.c
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Nannan Zhao <znannan1@vt.edu>");
 +MODULE_DESCRIPTION("Kernel support for CMASK");
-diff -ruN linux-stable-orginal/mm/page_io.c linux-stable-cmask/mm/page_io.c
---- linux-stable-orginal/mm/page_io.c	2018-09-22 14:07:33.000000000 -0400
+diff -ruN linux-stable/mm/page_io.c linux-stable-cmask/mm/page_io.c
+--- linux-stable/mm/page_io.c	2018-09-22 14:07:33.000000000 -0400
 +++ linux-stable-cmask/mm/page_io.c	2018-09-22 12:47:51.000000000 -0400
 @@ -233,13 +233,13 @@
  		unlock_page(page);
@@ -1410,8 +1410,8 @@ diff -ruN linux-stable-orginal/mm/page_io.c linux-stable-cmask/mm/page_io.c
  		SetPageUptodate(page);
  		unlock_page(page);
  		goto out;
-diff -ruN linux-stable-orginal/mm/vmscan.c linux-stable-cmask/mm/vmscan.c
---- linux-stable-orginal/mm/vmscan.c	2018-09-22 14:07:33.000000000 -0400
+diff -ruN linux-stable/mm/vmscan.c linux-stable-cmask/mm/vmscan.c
+--- linux-stable/mm/vmscan.c	2018-09-22 14:07:33.000000000 -0400
 +++ linux-stable-cmask/mm/vmscan.c	2018-09-20 16:37:01.000000000 -0400
 @@ -3288,6 +3288,8 @@
  			 * that that high watermark would be met at 100%
