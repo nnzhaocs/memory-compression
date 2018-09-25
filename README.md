@@ -12,17 +12,24 @@
 ### Building the kernel
 - Build your customized kernel using the commands below:
 
-    `make mrproper`
+    ```cp /boot/config-`uname -r` .config```
+    
+    ```make -j `getconf _NPROCESSORS_ONLN` deb-pkg LOCALVERSION=-custom-cmask```
+    
+        If there is problem, try: 
+        
+        `sudo apt-get install -y chrpath gawk texinfo libsdl1.2-dev whiptail diffstat cpio libssl-dev`
+        
+    `yes '' | make oldconfig`
+    
+    `make clean`
 
-    `make menuconfig`
+    `cd ..`
 
-    `make bzImage`
+    `sudo dpkg -i linux-image-2.6.24-rc5-custom_2.6.24-rc5-custom-10.00.Custom_i386.deb`
+    
+    `sudo dpkg -i linux-headers-2.6.24-rc5-custom_2.6.24-rc5-custom-10.00.Custom_i386.deb`
 
-    `make modules`
-
-    `sudo make modules_install`
-
-    `sudo make install`
 - Reserve RAM area for compression buffer:
 
     Add or append an entry to `/etc/default/grub`: `GRUB_CMDLINE_LINUX="memmap=4K!4G"`
@@ -30,6 +37,9 @@
     Use `dmesg` to see reserved ranges
         
 - Reboot your machine and choose your new kernel in grub. Now you are using your new kernel.
+    
+    `sudo reboot`
+    
 ## Test system calls
 - sys_cmask_insert_SPP_to_IAL is implemented to insert SPP to Indirectly addressable location. 
 
