@@ -38,6 +38,8 @@
     
     `sudo reboot`
     
+    Select the newly installed kernel.
+    
 ## Test system calls
 - sys_cmask_insert_SPP_to_IAL is implemented to insert SPP to Indirectly addressable location. 
 
