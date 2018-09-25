@@ -1298,7 +1298,7 @@ static int __init init_kcmask(void)
 //   /* unmap io memory */
 //    iounmap(virt_addr);
 
-	pr_info("start register front swap ops\n"）
+	pr_info("start register front swap ops\n");
 	frontswap_register_ops(&kcmask_frontswap_ops);
 //	if (kcmask_debugfs_init())
 //		pr_warn("debugfs initialization failed\n");
