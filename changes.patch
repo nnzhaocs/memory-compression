@@ -62,6 +62,36 @@ diff -ruN linux-stable/kernel/sys.c linux-stable-cmask/kernel/sys.c
  #ifdef CONFIG_COMPAT
  struct compat_sysinfo {
  	s32 uptime;
+diff -ruN linux-stable/mm/Kconfig linux-stable-cmask/mm/Kconfig
+--- linux-stable/mm/Kconfig	2018-09-22 14:07:33.000000000 -0400
++++ linux-stable-cmask/mm/Kconfig	2018-09-25 14:17:32.000000000 -0400
+@@ -560,7 +560,14 @@
+ 	  interactions don't cause any known issues on simple memory setups,
+ 	  they have not be fully explored on the large set of potential
+ 	  configurations and workloads that exist.
+-
++	  
++config KCMASK
++	bool "Kernel support for KCMASK (EXPERIMENTAL)"
++	depends on FRONTSWAP
++	default n
++	help
++		help.
++	
+ config ZPOOL
+ 	tristate "Common API for compressed memory storage"
+ 	default n
+diff -ruN linux-stable/mm/Makefile linux-stable-cmask/mm/Makefile
+--- linux-stable/mm/Makefile	2018-09-22 14:07:33.000000000 -0400
++++ linux-stable-cmask/mm/Makefile	2018-09-25 13:33:14.000000000 -0400
+@@ -40,6 +40,7 @@
+ obj-$(CONFIG_SWAP)	+= page_io.o swap_state.o swapfile.o
+ obj-$(CONFIG_FRONTSWAP)	+= frontswap.o
+ obj-$(CONFIG_ZSWAP)	+= zswap.o
++obj-$(CONFIG_KCMASK)	+= kcmask.o
+ obj-$(CONFIG_HAS_DMA)	+= dmapool.o
+ obj-$(CONFIG_HUGETLBFS)	+= hugetlb.o
+ obj-$(CONFIG_NUMA) 	+= mempolicy.o
 diff -ruN linux-stable/mm/kcmask.c linux-stable-cmask/mm/kcmask.c
 --- linux-stable/mm/kcmask.c	1969-12-31 19:00:00.000000000 -0500
 +++ linux-stable-cmask/mm/kcmask.c	2018-09-22 16:19:55.000000000 -0400
