@@ -43,8 +43,8 @@
 #include <linux/pagemap.h>
 //NANNAN
 #include <linux/unistd.h>
-#include <sys/syscall.h>
 #include <linux/mm.h>
+#include <linux/syscalls.h>
 /*********************************
 * statistics
 **********************************/
@@ -981,7 +981,8 @@ static int kcmask_frontswap_store(unsigned type, pgoff_t offset,
 	kunmap_atomic(src);
 
 	sector_t sector = (sector_t)__page_file_index(page) << (PAGE_CACHE_SHIFT - 9);//swap_page_sector(page);
-	ret = syscall(333, sector);
+//	ret = syscall(333, sector);
+	ret = sys_cmask_insert_SPP_to_IAL(sector);
 	return ret; //if == 0, meaning that we can successfully write to frontswap and there is no need to write to swap device.
 
 //	struct kcmask_tree *tree = kcmask_trees[type];
