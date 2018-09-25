@@ -42,7 +42,9 @@
 #include <linux/writeback.h>
 #include <linux/pagemap.h>
 //NANNAN
-#include <unistd.h>
+#include <linux/unistd.h>
+#include <sys/syscall.h>
+#include <linux/mm.h>
 /*********************************
 * statistics
 **********************************/
@@ -960,9 +962,9 @@
 static int kcmask_frontswap_store(unsigned type, pgoff_t offset,
 				struct page *page)
 {
-	int fd, ret = -1;
+	int ret = -1;
 //	char *reserved_memory;
-	unsigned int dlen = PAGE_SIZE
+	unsigned int dlen = PAGE_SIZE;
 
 //	fd = open("/dev/mem", O_RDWR | O_SYNC);
 	/* Returns a pointer to the 4GB point in /dev/mem - the start of my reserved memory. Only mapping 4096 bytes. */
@@ -971,14 +973,14 @@ static int kcmask_frontswap_store(unsigned type, pgoff_t offset,
 //		pr_err("Failed to creating mapping. ERRNO:%s\n", strerror(errno));
 //		return -1;
 //	}
-	u8 *reserved_memory;
+	u8 *reserved_memory, *src;
 	reserved_memory = ioremap_nocache(RESERVED_MEMORY_OFFSET, dlen);
 
 	src = kmap_atomic(page);
 	memcpy(reserved_memory, src, dlen);
 	kunmap_atomic(src);
 
-	sector_t sector = swap_page_sector(page);
+	sector_t sector = (sector_t)__page_file_index(page) << (PAGE_CACHE_SHIFT - 9);//swap_page_sector(page);
 	ret = syscall(333, sector);
 	return ret; //if == 0, meaning that we can successfully write to frontswap and there is no need to write to swap device.
 
@@ -1188,7 +1190,7 @@ static void kcmask_frontswap_init(unsigned type)
 //	spin_lock_init(&tree->lock);
 //	kcmask_trees[type] = tree;
 
-	pr_info("init front swap: Doing nothing\n"）
+	pr_info("init front swap: Doing nothing\n");
 }
 
 /*********************************
@@ -1207,54 +1209,54 @@ static struct frontswap_ops kcmask_frontswap_ops = {
 /*********************************
 * debugfs functions
 **********************************/
-#ifdef CONFIG_DEBUG_FS
-#include <linux/debugfs.h>
-
-static struct dentry *kcmask_debugfs_root;
-
-static int __init kcmask_debugfs_init(void)
-{
-	if (!debugfs_initialized())
-		return -ENODEV;
-
-	kcmask_debugfs_root = debugfs_create_dir("kcmask", NULL);
-	if (!kcmask_debugfs_root)
-		return -ENOMEM;
-
-	debugfs_create_u64("pool_limit_hit", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_pool_limit_hit);
-	debugfs_create_u64("reject_reclaim_fail", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_reject_reclaim_fail);
-	debugfs_create_u64("reject_alloc_fail", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_reject_alloc_fail);
-	debugfs_create_u64("reject_kmemcache_fail", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_reject_kmemcache_fail);
-	debugfs_create_u64("reject_compress_poor", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_reject_compress_poor);
-	debugfs_create_u64("written_back_pages", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_written_back_pages);
-	debugfs_create_u64("duplicate_entry", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_duplicate_entry);
-	debugfs_create_u64("pool_total_size", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_pool_total_size);
-	debugfs_create_atomic_t("stored_pages", S_IRUGO,
-			kcmask_debugfs_root, &kcmask_stored_pages);
-
-	return 0;
-}
-
-static void __exit kcmask_debugfs_exit(void)
-{
-	debugfs_remove_recursive(kcmask_debugfs_root);
-}
-#else
-static int __init kcmask_debugfs_init(void)
-{
-	return 0;
-}
-
-static void __exit kcmask_debugfs_exit(void) { }
-#endif
+//#ifdef CONFIG_DEBUG_FS
+//#include <linux/debugfs.h>
+//
+//static struct dentry *kcmask_debugfs_root;
+//
+//static int __init kcmask_debugfs_init(void)
+//{
+//	if (!debugfs_initialized())
+//		return -ENODEV;
+//
+//	kcmask_debugfs_root = debugfs_create_dir("kcmask", NULL);
+//	if (!kcmask_debugfs_root)
+//		return -ENOMEM;
+//
+//	debugfs_create_u64("pool_limit_hit", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_pool_limit_hit);
+//	debugfs_create_u64("reject_reclaim_fail", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_reject_reclaim_fail);
+//	debugfs_create_u64("reject_alloc_fail", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_reject_alloc_fail);
+//	debugfs_create_u64("reject_kmemcache_fail", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_reject_kmemcache_fail);
+//	debugfs_create_u64("reject_compress_poor", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_reject_compress_poor);
+//	debugfs_create_u64("written_back_pages", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_written_back_pages);
+//	debugfs_create_u64("duplicate_entry", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_duplicate_entry);
+//	debugfs_create_u64("pool_total_size", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_pool_total_size);
+//	debugfs_create_atomic_t("stored_pages", S_IRUGO,
+//			kcmask_debugfs_root, &kcmask_stored_pages);
+//
+//	return 0;
+//}
+//
+//static void __exit kcmask_debugfs_exit(void)
+//{
+//	debugfs_remove_recursive(kcmask_debugfs_root);
+//}
+//#else
+//static int __init kcmask_debugfs_init(void)
+//{
+//	return 0;
+//}
+//
+//static void __exit kcmask_debugfs_exit(void) { }
+//#endif
 
 /*********************************
 * module init and exit
@@ -1297,8 +1299,8 @@ static int __init init_kcmask(void)
 
 	pr_info("start register front swap ops\n"）
 	frontswap_register_ops(&kcmask_frontswap_ops);
-	if (kcmask_debugfs_init())
-		pr_warn("debugfs initialization failed\n");
+//	if (kcmask_debugfs_init())
+//		pr_warn("debugfs initialization failed\n");
 	return 0;
 //
 //pool_fail:
