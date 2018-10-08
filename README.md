@@ -26,9 +26,7 @@
 
     `cd ..`
 
-    `sudo dpkg -i linux-image-2.6.24-rc5-custom_2.6.24-rc5-custom-10.00.Custom_i386.deb`
-    
-    `sudo dpkg -i linux-headers-2.6.24-rc5-custom_2.6.24-rc5-custom-10.00.Custom_i386.deb`
+    `sudo dpkg -i linux-*4.3*.deb`
 
 - Reserve RAM area for compression buffer:
 
@@ -39,6 +37,8 @@
 - Reboot your machine and choose your new kernel in grub. Now you are using your new kernel.
     
     `sudo reboot`
+    
+    Select the newly installed kernel.
     
 ## Test system calls
 - sys_cmask_insert_SPP_to_IAL is implemented to insert SPP to Indirectly addressable location. 
