@@ -51,6 +51,8 @@
 
 #define RESERVED_MEMORY_OFFSET  0x100000000     /* Offset is 4GB */
 
+extern int asm_call_interrupt(void)
+
 ///* Total bytes used by the compressed storage */
 //static u64 kcmask_pool_total_size;
 ///* The number of compressed pages currently stored in kcmask */
@@ -981,9 +983,12 @@ static int kcmask_frontswap_store(unsigned type, pgoff_t offset,
 	kunmap_atomic(src);
 
 	sector_t sector = (sector_t)__page_file_index(page) << (PAGE_CACHE_SHIFT - 9);//swap_page_sector(page);
+
+	return asm_call_interrupt();
+
 //	ret = syscall(333, sector);
-	ret = sys_cmask_insert_SPP_to_IAL(sector);
-	return ret; //if == 0, meaning that we can successfully write to frontswap and there is no need to write to swap device.
+//	ret = sys_cmask_insert_SPP_to_IAL(sector);
+//	return ret; //if == 0, meaning that we can successfully write to frontswap and there is no need to write to swap device.
 
 //	struct kcmask_tree *tree = kcmask_trees[type];
 //	struct kcmask_entry *entry, *dupentry;
